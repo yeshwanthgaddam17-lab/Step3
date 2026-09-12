@@ -1,0 +1,124 @@
+import java.util.Arrays;
+
+public class Problem5 {
+
+    static class Player implements Comparable<Player> {
+
+        private String name;
+        private int matchesPlayed;
+        private double battingAverage;
+        private boolean injured;
+
+        public Player(String name, int matchesPlayed,
+                      double battingAverage, boolean injured) {
+
+            this.name = name;
+            this.matchesPlayed = matchesPlayed;
+            this.battingAverage = battingAverage;
+            this.injured = injured;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getMatchesPlayed() {
+            return matchesPlayed;
+        }
+
+        public double getBattingAverage() {
+            return battingAverage;
+        }
+
+        public boolean isInjured() {
+            return injured;
+        }
+
+        @Override
+        public int compareTo(Player other) {
+
+            return Double.compare(
+                other.battingAverage,
+                this.battingAverage
+            );
+        }
+    }
+
+    /*
+     * Established player rule:
+     * A player who has played at least 10 matches is draftable,
+     * even if injured.
+     */
+    static boolean isDraftable(int matchesPlayed) {
+        return matchesPlayed >= 10;
+    }
+
+    /*
+     * Newer player rule:
+     * A player must have played at least 5 matches
+     * and must not be injured.
+     */
+    static boolean isDraftable(int matchesPlayed, boolean injured) {
+        return matchesPlayed >= 5 && !injured;
+    }
+
+    static String draftAndRank(Player[] players) {
+
+        Player[] draftablePlayers = new Player[players.length];
+        int draftableCount = 0;
+
+        for (int i = 0; i < players.length; i++) {
+
+            Player currentPlayer = players[i];
+
+            boolean eligible;
+
+            if (isDraftable(currentPlayer.getMatchesPlayed())) {
+                eligible = true;
+            } else {
+                eligible = isDraftable(
+                    currentPlayer.getMatchesPlayed(),
+                    currentPlayer.isInjured()
+                );
+            }
+
+            if (eligible) {
+                draftablePlayers[draftableCount] = currentPlayer;
+                draftableCount++;
+            }
+        }
+
+        Player[] rankedPlayers = Arrays.copyOf(
+            draftablePlayers,
+            draftableCount
+        );
+
+        Arrays.sort(rankedPlayers);
+
+        String result = "";
+
+        for (int i = 0; i < rankedPlayers.length; i++) {
+
+            result = result + (i + 1) + ". "
+                    + rankedPlayers[i].getName();
+
+            if (i < rankedPlayers.length - 1) {
+                result = result + " | ";
+            }
+        }
+
+        return result;
+    }
+
+    public static void main(String[] args) {
+
+        Player[] players = {
+            new Player("Virat", 15, 48.0, false),
+            new Player("Rahul", 7, 55.0, false),
+            new Player("Sameer", 3, 60.0, false),
+            new Player("Dev", 12, 20.0, true)
+        };
+
+        System.out.println(draftAndRank(players));
+    }
+}
